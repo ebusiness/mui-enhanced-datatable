@@ -123,8 +123,9 @@ var ControlCreator = /*#__PURE__*/(0, _react.forwardRef)(function (props, ref) {
     }
   };
   var handleInputChangeAutoComplete = function handleInputChangeAutoComplete(event, inputValue, reason) {
-    // freeSolo時、ユーザーがタイプした文字列をそのまま値として反映する
-    if (reason === 'input' && handleChange) {
+    // freeSolo時、ユーザーがタイプ/クリアした内容をそのまま値として反映する。
+    // reason === 'reset'（value 反映による再同期）は無視し、入力フィードバックループを防ぐ
+    if ((reason === 'input' || reason === 'clear') && handleChange) {
       handleChange(column.name, inputValue, column.type)(event);
     }
   };
@@ -233,10 +234,13 @@ var ControlCreator = /*#__PURE__*/(0, _react.forwardRef)(function (props, ref) {
       }), column.help_text ? /*#__PURE__*/_react["default"].createElement(_core.FormHelperText, null, column.help_text) : null);
     } else if (column.variant === 'autocomplete') {
       var isFreeSolo = column.freeSolo === true;
+      // freeSolo は inputValue を受控にする。value を受控にすると MUI v4 が毎キーストロークで
+      // value→inputValue を再同期し、入力中の文字（特に IME 変換中）を飲み込んでしまうため。
       control = /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement(_Autocomplete["default"], {
         className: classes.autoCompleteWrapper,
         freeSolo: isFreeSolo,
-        value: _utils.common.getFromList(choices, 'value', value) || (isFreeSolo ? value || null : null),
+        value: isFreeSolo ? undefined : _utils.common.getFromList(choices, 'value', value) || null,
+        inputValue: isFreeSolo ? value == null ? '' : String(value) : undefined,
         options: choices,
         getOptionLabel: function getOptionLabel(option) {
           return (typeof option === 'string' ? option : option.display_name) || '';

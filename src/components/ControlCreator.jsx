@@ -97,8 +97,9 @@ const ControlCreator = forwardRef((props, ref) => {
   }
 
   const handleInputChangeAutoComplete = (event, inputValue, reason) => {
-    // freeSolo時、ユーザーがタイプした文字列をそのまま値として反映する
-    if (reason === 'input' && handleChange) {
+    // freeSolo時、ユーザーがタイプ/クリアした内容をそのまま値として反映する。
+    // reason === 'reset'（value 反映による再同期）は無視し、入力フィードバックループを防ぐ
+    if ((reason === 'input' || reason === 'clear') && handleChange) {
       handleChange(column.name, inputValue, column.type)(event);
     }
   }
@@ -238,12 +239,15 @@ const ControlCreator = forwardRef((props, ref) => {
       );
     } else if (column.variant === 'autocomplete') {
       const isFreeSolo = column.freeSolo === true;
+      // freeSolo は inputValue を受控にする。value を受控にすると MUI v4 が毎キーストロークで
+      // value→inputValue を再同期し、入力中の文字（特に IME 変換中）を飲み込んでしまうため。
       control = (
         <>
           <Autocomplete
             className={classes.autoCompleteWrapper}
             freeSolo={isFreeSolo}
-            value={common.getFromList(choices, 'value', value) || (isFreeSolo ? (value || null) : null)}
+            value={isFreeSolo ? undefined : (common.getFromList(choices, 'value', value) || null)}
+            inputValue={isFreeSolo ? (value == null ? '' : String(value)) : undefined}
             options={choices}
             getOptionLabel={option => (typeof option === 'string' ? option : option.display_name) || ''}
             getOptionDisabled={(option) => option.disabled === true}
