@@ -110,8 +110,9 @@ export default {
           return true;
         }
         const column = common.getFromList(columns, 'name', key);
+        // getFromList は不一致時に {} を返すため isEmpty で「列なし」を判定する。
         // 列に対応しないパラメーター（サーバー側フィルター等）はフィルターとして扱わない
-        if (!column) {
+        if (common.isEmpty(column)) {
           return true;
         }
         let value = json[key];
