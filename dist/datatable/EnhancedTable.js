@@ -220,9 +220,25 @@ function EnhancedTable(props) {
     _filters = _utils.table.resetFilter(_filters, tableHead);
     setFilters(_filters);
     saveFilter(_filters);
-    // filter 変化時に URL のフィルターパラメーターを同期する。
-    // これにより chip 削除後に同一リンクを再クリックしても location.search が変化して再フィルターが機能する。
-    _utils.table.changeFilterUrl(_filters, location, history);
+    // URL に既存の filter パラメーターがある場合のみ、そのキーを対象に URL を replace する。
+    // ・新規 filter は URL に書かない（他ページへの副作用を防ぐ）
+    // ・history.replace を使うことでブラウザ履歴を増やさない
+    var urlFilters = _utils.table.loadFilters(location, tableHead);
+    if (!_utils.common.isEmpty(urlFilters)) {
+      var json = _utils.common.urlToJson(location.search);
+      Object.keys(urlFilters).forEach(function (key) {
+        return delete json[key];
+      });
+      Object.keys(_filters).forEach(function (key) {
+        if (key in urlFilters) {
+          json[key] = _filters[key];
+        }
+      });
+      history.replace({
+        pathname: location.pathname,
+        search: _utils.common.jsonToUrl(json)
+      });
+    }
     // 1ページ目に移動
     handleChangePage(event, 0);
   };
