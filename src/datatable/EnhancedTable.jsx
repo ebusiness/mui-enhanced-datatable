@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 // @material-ui/core components
 import {
@@ -44,7 +44,7 @@ function EnhancedTable(props) {
   const [ fixedHeaderId, setFixedHeaderId ] = useState(null);
   const classes = useStyles();
   const location = useLocation()
-  // const history = useHistory();
+  const history = useHistory();
 
   useEffect(() => {
     setTableData(table.initTableData(props.tableData));
@@ -169,11 +169,11 @@ function EnhancedTable(props) {
     _filters = table.resetFilter(_filters, tableHead);
     setFilters(_filters)
     saveFilter(_filters);
+    // filter 変化時に URL のフィルターパラメーターを同期する。
+    // これにより chip 削除後に同一リンクを再クリックしても location.search が変化して再フィルターが機能する。
+    table.changeFilterUrl(_filters, location, history);
     // 1ページ目に移動
     handleChangePage(event, 0);
-    // if (urlReflect === true) {
-    //   table.changeFilterUrl(_filters, location, history);
-    // }
   };
 
   /**

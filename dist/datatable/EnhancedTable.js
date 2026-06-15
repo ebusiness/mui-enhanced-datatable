@@ -106,8 +106,7 @@ function EnhancedTable(props) {
     setFixedHeaderId = _useState22[1];
   var classes = useStyles();
   var location = (0, _reactRouterDom.useLocation)();
-  // const history = useHistory();
-
+  var history = (0, _reactRouterDom.useHistory)();
   (0, _react.useEffect)(function () {
     setTableData(_utils.table.initTableData(props.tableData));
   }, [props.tableData]);
@@ -221,11 +220,11 @@ function EnhancedTable(props) {
     _filters = _utils.table.resetFilter(_filters, tableHead);
     setFilters(_filters);
     saveFilter(_filters);
+    // filter 変化時に URL のフィルターパラメーターを同期する。
+    // これにより chip 削除後に同一リンクを再クリックしても location.search が変化して再フィルターが機能する。
+    _utils.table.changeFilterUrl(_filters, location, history);
     // 1ページ目に移動
     handleChangePage(event, 0);
-    // if (urlReflect === true) {
-    //   table.changeFilterUrl(_filters, location, history);
-    // }
   };
 
   /**
