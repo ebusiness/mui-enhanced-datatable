@@ -444,14 +444,28 @@ export default {
     if (!url) {
       return {};
     }
-    var hash;
     var json = {};
     var hashes = url.slice(url.indexOf('?') + 1).split('&');
+    // jsonToUrl が key/value を encodeURIComponent するため、対称にデコードする。
+    // 不正なエスケープ列で例外を投げないよう try/catch で元の値にフォールバックする。
+    var decode = function(s) {
+      if (s === undefined) {
+        return s;
+      }
+      try {
+        return decodeURIComponent(s);
+      } catch (e) {
+        return s;
+      }
+    };
     for (var i = 0; i < hashes.length; i++) {
-        hash = hashes[i].split('=');
-        json[hash[0]] = hash[1] === 'true' ? true : hash[1] === 'false' ? false : hash[1];
-        // If you want to get in native datatypes
-        // json[hash[0]] = JSON.parse(hash[1]); 
+        if (!hashes[i]) {
+          continue;
+        }
+        var hash = hashes[i].split('=');
+        var key = decode(hash[0]);
+        var rawValue = hash[1];
+        json[key] = rawValue === 'true' ? true : rawValue === 'false' ? false : decode(rawValue);
     }
     return json;
   },

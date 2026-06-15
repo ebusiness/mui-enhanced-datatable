@@ -102,24 +102,30 @@ export default {
    */
   loadFilters: function(location, columns) {
     if (location && location.search) {
-      let json = common.urlToJson(location.search);
+      const json = common.urlToJson(location.search);
+      const filters = {};
       Object.keys(json).map(key => {
+        // __order / __page などの内部パラメーターはフィルター対象外
         if (key.slice(0, 2) === '__') {
-          delete json[key];
+          return true;
         }
         const column = common.getFromList(columns, 'name', key);
-        if (column) {
-          if (column.type === "integer") {
-            json[key] = parseInt(json[key]);
-          } else if (column.choices && !common.isEmpty(column.choices)) {
-            if (typeof column.choices[0].value === 'number') {
-              json[key] = parseFloat(json[key]);
-            }
+        // 列に対応しないパラメーター（サーバー側フィルター等）はフィルターとして扱わない
+        if (!column) {
+          return true;
+        }
+        let value = json[key];
+        if (column.type === "integer") {
+          value = parseInt(value);
+        } else if (column.choices && !common.isEmpty(column.choices)) {
+          if (typeof column.choices[0].value === 'number') {
+            value = parseFloat(value);
           }
         }
+        filters[key] = value;
         return true;
       });
-      return json;
+      return filters;
     } else {
       return {};
     }

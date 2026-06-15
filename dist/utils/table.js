@@ -109,23 +109,29 @@ var _default = exports["default"] = {
   loadFilters: function loadFilters(location, columns) {
     if (location && location.search) {
       var json = _common["default"].urlToJson(location.search);
+      var filters = {};
       Object.keys(json).map(function (key) {
+        // __order / __page などの内部パラメーターはフィルター対象外
         if (key.slice(0, 2) === '__') {
-          delete json[key];
+          return true;
         }
         var column = _common["default"].getFromList(columns, 'name', key);
-        if (column) {
-          if (column.type === "integer") {
-            json[key] = parseInt(json[key]);
-          } else if (column.choices && !_common["default"].isEmpty(column.choices)) {
-            if (typeof column.choices[0].value === 'number') {
-              json[key] = parseFloat(json[key]);
-            }
+        // 列に対応しないパラメーター（サーバー側フィルター等）はフィルターとして扱わない
+        if (!column) {
+          return true;
+        }
+        var value = json[key];
+        if (column.type === "integer") {
+          value = parseInt(value);
+        } else if (column.choices && !_common["default"].isEmpty(column.choices)) {
+          if (typeof column.choices[0].value === 'number') {
+            value = parseFloat(value);
           }
         }
+        filters[key] = value;
         return true;
       });
-      return json;
+      return filters;
     } else {
       return {};
     }
