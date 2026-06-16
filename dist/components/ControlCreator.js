@@ -324,6 +324,10 @@ var ControlCreator = /*#__PURE__*/(0, _react.forwardRef)(function (props, ref) {
       InputLabelProps: {
         shrink: true
       },
+      inputProps: {
+        min: column.min_value,
+        max: column.max_value
+      },
       onChange: handleInnerChange
     });
   } else if (column.type === 'text') {
@@ -424,8 +428,8 @@ ControlCreator.propTypes = {
     required: _propTypes["default"].bool,
     help_text: _propTypes["default"].string,
     multiple: _propTypes["default"].bool,
-    min_value: _propTypes["default"].number,
-    max_value: _propTypes["default"].number,
+    min_value: _propTypes["default"].oneOfType([_propTypes["default"].number, _propTypes["default"].string]),
+    max_value: _propTypes["default"].oneOfType([_propTypes["default"].number, _propTypes["default"].string]),
     step: _propTypes["default"].number,
     "native": _propTypes["default"].bool,
     choices: _propTypes["default"].array,

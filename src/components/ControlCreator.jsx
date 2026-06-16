@@ -346,6 +346,7 @@ const ControlCreator = forwardRef((props, ref) => {
         InputLabelProps={{
           shrink: true,
         }}
+        inputProps={{min: column.min_value, max: column.max_value}}
         onChange={handleInnerChange}
       />
     );
@@ -457,8 +458,8 @@ ControlCreator.propTypes = {
     required: PropTypes.bool,
     help_text: PropTypes.string,
     multiple: PropTypes.bool,
-    min_value: PropTypes.number,
-    max_value: PropTypes.number,
+    min_value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    max_value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     step: PropTypes.number,
     native: PropTypes.bool,
     choices: PropTypes.array,
