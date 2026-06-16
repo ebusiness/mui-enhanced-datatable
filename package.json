@@ -1,6 +1,6 @@
 {
   "name": "mui-enhanced-datatable",
-  "version": "1.1.23",
+  "version": "1.1.24",
   "description": "Material UI Datatable (e-business fork: autocomplete freeSolo 対応)",
   "main": "dist/index.js",
   "scripts": {

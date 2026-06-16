@@ -186,7 +186,9 @@ export default {
       // Do nothing
     } else if (column.choices && !this.isEmpty(column.choices)) {
       let item = this.getFromList(column.choices, 'value', value);
-      if (item) {
+      // getFromList は不一致時 {} を返すため isEmpty で判定し、
+      // freeSolo 等で choices に無い値はそのまま表示する（chip が空白になるのを防ぐ）
+      if (!this.isEmpty(item)) {
         label = item.display_name;
       }
     } else if (column.type === 'boolean') {
