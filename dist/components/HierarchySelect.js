@@ -30,6 +30,21 @@ function HierarchySelect(props) {
     label = props.label,
     handleChange = props.handleChange;
   var classes = userStyles();
+
+  // 選択済み表示は MenuItem の文字列（選択階層のみ）ではなく、親階層を含む全称にする
+  var getFullName = function getFullName(val) {
+    var names = [];
+    var item = choices.find(function (i) {
+      return i.value === val;
+    });
+    while (item) {
+      names.unshift(item.display_name);
+      item = choices.find(function (i) {
+        return i.value === item.parent;
+      });
+    }
+    return names.join('/');
+  };
   var getAllItems = function getAllItems() {
     var rootItems = _utils.common.isEmpty(choices) ? [] : choices.filter(function (item) {
       return item.parent === null;
@@ -80,7 +95,8 @@ function HierarchySelect(props) {
       name: name,
       value: value
     },
-    onChange: handleChange
+    onChange: handleChange,
+    renderValue: _native === true ? undefined : getFullName
   }, _native === true ? /*#__PURE__*/_react["default"].createElement("option", {
     value: ""
   }) : /*#__PURE__*/_react["default"].createElement(_core.MenuItem, {

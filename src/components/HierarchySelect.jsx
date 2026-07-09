@@ -23,6 +23,17 @@ function HierarchySelect(props) {
   const { choices, native, name, value, label, handleChange } = props;
   const classes = userStyles();
 
+  // 選択済み表示は MenuItem の文字列（選択階層のみ）ではなく、親階層を含む全称にする
+  const getFullName = (val) => {
+    const names = [];
+    let item = choices.find(i => i.value === val);
+    while (item) {
+      names.unshift(item.display_name);
+      item = choices.find(i => i.value === item.parent);
+    }
+    return names.join('/');
+  };
+
   const getAllItems = () => {
     const rootItems = common.isEmpty(choices) ? [] : choices.filter(item => item.parent === null);
     let items = [];
@@ -74,6 +85,7 @@ function HierarchySelect(props) {
         value={value}
         inputProps={{ name: name, value: value }}
         onChange={handleChange}
+        renderValue={native === true ? undefined : getFullName}
       >
         {native === true ? <option value=""></option> : <MenuItem key='none' value=""><em>None</em></MenuItem>}
         {getAllItems().map(item => {
